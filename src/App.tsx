@@ -2,8 +2,8 @@ import { useQuery } from "@apollo/client";
 import { gql } from "./generated";
 
 const getCharacters = gql(/* GraphQL */ `
-  query getCharacters {
-    characters {
+  query getCharacters($page: Int) {
+    characters(page: $page) {
       info {
         count
         pages
@@ -25,21 +25,42 @@ const getCharacters = gql(/* GraphQL */ `
 `);
 
 function App() {
-  const { data, loading } = useQuery(getCharacters);
+  const { data, loading, refetch } = useQuery(getCharacters, {
+    variables: {
+      page: 1,
+    },
+    notifyOnNetworkStatusChange: true,
+  });
 
-  if (loading) return <span>Loading...</span>;
   return (
     <section>
-      <h1>Characters</h1>
-      <ul>
-        {data?.characters?.results?.map((character) => (
-          <li key={character?.id}>
-            <img src={character?.image as string} width="200" height="200" />
-            <span>Name:{character?.name}</span>
-            <span>Status:{character?.status}</span>
-          </li>
-        ))}
-      </ul>
+      <button
+        onClick={() => {
+          refetch({ page: 2 });
+        }}
+      >
+        Refetch
+      </button>
+      {loading ? (
+        <span>Loading...</span>
+      ) : (
+        <>
+          <h1>Characters</h1>
+          <ul>
+            {data?.characters?.results?.map((character) => (
+              <li key={character?.id}>
+                <img
+                  src={character?.image as string}
+                  width="200"
+                  height="200"
+                />
+                <span>Name:{character?.name}</span>
+                <span>Status:{character?.status}</span>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
     </section>
   );
 }
