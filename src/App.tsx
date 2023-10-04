@@ -1,13 +1,11 @@
 import { useQuery } from "@apollo/client";
+
 import { gql } from "./generated";
+import Location from "./location";
 
 const getCharacters = gql(/* GraphQL */ `
   query getCharacters($page: Int) {
     characters(page: $page) {
-      info {
-        count
-        pages
-      }
       results {
         id
         name
@@ -16,8 +14,7 @@ const getCharacters = gql(/* GraphQL */ `
         gender
         image
         location {
-          name
-          type
+          ...LocationParts
         }
       }
     }
@@ -47,17 +44,23 @@ function App() {
         <>
           <h1>Characters</h1>
           <ul>
-            {data?.characters?.results?.map((character) => (
-              <li key={character?.id}>
-                <img
-                  src={character?.image as string}
-                  width="200"
-                  height="200"
-                />
-                <span>Name:{character?.name}</span>
-                <span>Status:{character?.status}</span>
-              </li>
-            ))}
+            {data?.characters?.results?.map((character) => {
+              if (!character) return <li>No Character</li>;
+              return (
+                <li key={character?.id}>
+                  <img
+                    src={character?.image as string}
+                    width="200"
+                    height="200"
+                  />
+                  <span>Name:{character.name}</span>
+                  <span>Status:{character.status}</span>
+                  {character.location == null ? null : (
+                    <Location location={character.location} />
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </>
       )}

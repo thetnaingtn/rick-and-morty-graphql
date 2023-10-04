@@ -13,7 +13,9 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
-    "\n  query getCharacters($page: Int) {\n    characters(page: $page) {\n      info {\n        count\n        pages\n      }\n      results {\n        id\n        name\n        status\n        species\n        gender\n        image\n        location {\n          name\n          type\n        }\n      }\n    }\n  }\n": types.GetCharactersDocument,
+    "\n  query getCharacters($page: Int) {\n    characters(page: $page) {\n      results {\n        id\n        name\n        status\n        species\n        gender\n        image\n        location {\n          ...LocationParts\n        }\n      }\n    }\n  }\n": types.GetCharactersDocument,
+    "fragment LocationParts on Location {\n  name\n  dimension\n  type\n}": types.LocationPartsFragmentDoc,
+    "\n  fragment LocationParts on Location {\n    name\n    dimension\n    type\n  }\n": types.LocationPartsFragmentDoc,
 };
 
 /**
@@ -33,7 +35,15 @@ export function gql(source: string): unknown;
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function gql(source: "\n  query getCharacters($page: Int) {\n    characters(page: $page) {\n      info {\n        count\n        pages\n      }\n      results {\n        id\n        name\n        status\n        species\n        gender\n        image\n        location {\n          name\n          type\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query getCharacters($page: Int) {\n    characters(page: $page) {\n      info {\n        count\n        pages\n      }\n      results {\n        id\n        name\n        status\n        species\n        gender\n        image\n        location {\n          name\n          type\n        }\n      }\n    }\n  }\n"];
+export function gql(source: "\n  query getCharacters($page: Int) {\n    characters(page: $page) {\n      results {\n        id\n        name\n        status\n        species\n        gender\n        image\n        location {\n          ...LocationParts\n        }\n      }\n    }\n  }\n"): (typeof documents)["\n  query getCharacters($page: Int) {\n    characters(page: $page) {\n      results {\n        id\n        name\n        status\n        species\n        gender\n        image\n        location {\n          ...LocationParts\n        }\n      }\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "fragment LocationParts on Location {\n  name\n  dimension\n  type\n}"): (typeof documents)["fragment LocationParts on Location {\n  name\n  dimension\n  type\n}"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  fragment LocationParts on Location {\n    name\n    dimension\n    type\n  }\n"): (typeof documents)["\n  fragment LocationParts on Location {\n    name\n    dimension\n    type\n  }\n"];
 
 export function gql(source: string) {
   return (documents as any)[source] ?? {};
