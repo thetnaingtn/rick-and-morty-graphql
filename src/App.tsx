@@ -4,7 +4,7 @@ import { gql } from "./generated";
 import Location from "./location";
 
 const getCharacters = gql(/* GraphQL */ `
-  query getCharacters($page: Int) {
+  query getCharacters($page: Int, $withLocation: Boolean!) {
     characters(page: $page) {
       results {
         id
@@ -13,7 +13,7 @@ const getCharacters = gql(/* GraphQL */ `
         species
         gender
         image
-        location {
+        location @include(if: $withLocation) {
           ...LocationParts
         }
       }
@@ -25,6 +25,7 @@ function App() {
   const { data, loading, refetch } = useQuery(getCharacters, {
     variables: {
       page: 1,
+      withLocation: false,
     },
     notifyOnNetworkStatusChange: true,
   });
