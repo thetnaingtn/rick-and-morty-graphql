@@ -12,7 +12,7 @@ const apolloClient = new ApolloClient({
       Query: {
         fields: {
           characters: {
-            keyArgs: false,
+            keyArgs: ["filter", ["species"]],
             merge(existing, incoming) {
               const { results = [] } = existing || {};
               return {

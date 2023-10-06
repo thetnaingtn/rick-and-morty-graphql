@@ -4,8 +4,8 @@ import { GetCharactersQuery } from "./generated/graphql";
 import { useRef } from "react";
 
 const getCharacters = gql(/* GraphQL */ `
-  query getCharacters($page: Int) {
-    characters(page: $page) {
+  query getCharacters($page: Int, $species: String) {
+    characters(page: $page, filter: { species: $species }) {
       results {
         id
         name
@@ -42,25 +42,37 @@ function CharactersList({
 }
 
 function App() {
-  const pageRef = useRef(1);
+  const humanPageRef = useRef(1);
+  const alienPageRef = useRef(1);
   const { data, loading, fetchMore } = useQuery(getCharacters, {
     notifyOnNetworkStatusChange: true,
     variables: {
-      page: pageRef.current,
+      page: 1,
+      species: "Alien",
     },
   });
   return (
     <section>
-      <div>
+      <div style={{ display: "flex", gap: "10px" }}>
         <button
           onClick={() => {
-            pageRef.current++;
+            humanPageRef.current++;
             fetchMore({
-              variables: { page: pageRef.current },
+              variables: { page: humanPageRef.current, species: "Human" },
             });
           }}
         >
-          Fetch More
+          Fetch More Human Species
+        </button>
+        <button
+          onClick={() => {
+            alienPageRef.current++;
+            fetchMore({
+              variables: { page: alienPageRef.current, species: "Alien" },
+            });
+          }}
+        >
+          Fetch More Alien Species
         </button>
       </div>
 
