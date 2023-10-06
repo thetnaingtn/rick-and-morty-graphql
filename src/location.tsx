@@ -2,6 +2,7 @@ import { FragmentType, gql, useFragment } from "./generated";
 
 const LOCATION_FRAGMENT = gql(`
   fragment LocationParts on Location {
+    id
     name
     dimension
     type

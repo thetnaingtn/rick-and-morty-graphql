@@ -1,4 +1,5 @@
 fragment LocationParts on Location {
+  id
   name
   dimension
   type
