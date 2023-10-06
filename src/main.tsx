@@ -7,7 +7,24 @@ import "./index.css";
 
 const apolloClient = new ApolloClient({
   uri: "https://rickandmortyapi.com/graphql",
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      Query: {
+        fields: {
+          characters: {
+            keyArgs: false,
+            merge(existing, incoming) {
+              const { results = [] } = existing || {};
+              return {
+                ...incoming,
+                results: [...results, ...incoming.results],
+              };
+            },
+          },
+        },
+      },
+    },
+  }),
 });
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

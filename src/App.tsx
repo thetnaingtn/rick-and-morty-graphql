@@ -1,13 +1,11 @@
 import { useQuery } from "@apollo/client";
 import { gql } from "./generated";
+import { GetCharactersQuery } from "./generated/graphql";
+import { useRef } from "react";
 
 const getCharacters = gql(/* GraphQL */ `
   query getCharacters($page: Int) {
     characters(page: $page) {
-      info {
-        count
-        pages
-      }
       results {
         id
         name
@@ -16,6 +14,7 @@ const getCharacters = gql(/* GraphQL */ `
         gender
         image
         location {
+          id
           name
           type
         }
@@ -24,41 +23,55 @@ const getCharacters = gql(/* GraphQL */ `
   }
 `);
 
-function App() {
-  const { data, loading, refetch } = useQuery(getCharacters, {
-    variables: {
-      page: 1,
-    },
-    notifyOnNetworkStatusChange: true,
-  });
+function CharactersList({
+  characters,
+}: {
+  characters: GetCharactersQuery["characters"];
+}) {
+  return (
+    <ul>
+      {characters?.results?.map((character) => (
+        <li key={character?.id}>
+          <img src={character?.image as string} width="200" height="200" />
+          <span>Name:{character?.name}</span>
+          <span>Status:{character?.status}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
 
+function App() {
+  const pageRef = useRef(1);
+  const { data, loading, fetchMore } = useQuery(getCharacters, {
+    notifyOnNetworkStatusChange: true,
+    variables: {
+      page: pageRef.current,
+    },
+  });
   return (
     <section>
-      <button
-        onClick={() => {
-          refetch({ page: 2 });
-        }}
-      >
-        Refetch
-      </button>
+      <div>
+        <button
+          onClick={() => {
+            pageRef.current++;
+            fetchMore({
+              variables: { page: pageRef.current },
+            });
+          }}
+        >
+          Fetch More
+        </button>
+      </div>
+
       {loading ? (
         <span>Loading...</span>
       ) : (
         <>
           <h1>Characters</h1>
-          <ul>
-            {data?.characters?.results?.map((character) => (
-              <li key={character?.id}>
-                <img
-                  src={character?.image as string}
-                  width="200"
-                  height="200"
-                />
-                <span>Name:{character?.name}</span>
-                <span>Status:{character?.status}</span>
-              </li>
-            ))}
-          </ul>
+          {data?.characters == null ? null : (
+            <CharactersList characters={data.characters} />
+          )}
         </>
       )}
     </section>
