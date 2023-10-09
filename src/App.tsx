@@ -4,10 +4,6 @@ import { gql } from "./generated";
 const getCharacters = gql(/* GraphQL */ `
   query getCharacters($page: Int) {
     characters(page: $page) {
-      info {
-        count
-        pages
-      }
       results {
         id
         name
@@ -15,7 +11,9 @@ const getCharacters = gql(/* GraphQL */ `
         species
         gender
         image
+        feeling @client
         location {
+          id
           name
           type
         }
@@ -31,7 +29,7 @@ function App() {
     },
     notifyOnNetworkStatusChange: true,
   });
-
+  console.log(data?.characters?.results);
   return (
     <section>
       <button
@@ -56,6 +54,7 @@ function App() {
                 />
                 <span>Name:{character?.name}</span>
                 <span>Status:{character?.status}</span>
+                <span>Feeling:{character?.feeling}</span>
               </li>
             ))}
           </ul>
