@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { useApolloClient, useQuery } from "@apollo/client";
 import { gql } from "./generated";
 import { GetCharactersQuery } from "./generated/graphql";
 import { useRef } from "react";
@@ -35,6 +35,7 @@ function CharactersList({
           <img src={character?.image as string} width="200" height="200" />
           <span>Name:{character?.name}</span>
           <span>Status:{character?.status}</span>
+          <span>Location:{character?.location?.name}</span>
         </li>
       ))}
     </ul>
@@ -44,6 +45,7 @@ function CharactersList({
 function App() {
   const humanPageRef = useRef(1);
   const alienPageRef = useRef(1);
+  const client = useApolloClient();
   const { data, loading, fetchMore } = useQuery(getCharacters, {
     notifyOnNetworkStatusChange: true,
     variables: {
@@ -73,6 +75,27 @@ function App() {
           }}
         >
           Fetch More Alien Species
+        </button>
+        <button
+          onClick={() => {
+            client.writeFragment({
+              id: "Location:3",
+              fragment: gql(`
+              fragment LocationFields on Location{
+                id
+                name
+                type
+              }
+            `),
+              data: {
+                id: "3",
+                name: "Thailand",
+                type: "Planet",
+              },
+            });
+          }}
+        >
+          Update Location
         </button>
       </div>
 
