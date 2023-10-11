@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { useApolloClient, useQuery } from "@apollo/client";
 import { gql } from "./generated";
 
 const getCharacters = gql(/* GraphQL */ `
@@ -24,6 +24,30 @@ const getCharacters = gql(/* GraphQL */ `
   }
 `);
 
+const character = gql(`
+query getCharacter($id:ID!){
+  character(id:$id){
+    id
+    name
+    status
+    species
+  }
+}
+`);
+
+function NewCharacter() {
+  const { data } = useQuery(character, {
+    variables: { id: "500" },
+  });
+
+  return (
+    <div>
+      <h1>{data?.character?.name}</h1>
+      <p>{data?.character?.status}</p>
+    </div>
+  );
+}
+
 function App() {
   const { data, loading, refetch } = useQuery(getCharacters, {
     variables: {
@@ -31,6 +55,35 @@ function App() {
     },
     notifyOnNetworkStatusChange: true,
   });
+
+  const client = useApolloClient();
+
+  const addNewCharacter = () => {
+    client.writeQuery({
+      query: gql(`
+        query getCharacter($id:ID!){
+          character(id:$id){
+            id
+            name
+            status
+            species
+          }
+        }
+      `),
+      data: {
+        character: {
+          __typename: "Character",
+          id: "500",
+          name: "Chihiro",
+          status: "Alive",
+          species: "Human",
+        },
+      },
+      variables: {
+        id: "500",
+      },
+    });
+  };
 
   return (
     <section>
@@ -41,6 +94,8 @@ function App() {
       >
         Refetch
       </button>
+      <button onClick={addNewCharacter}>Add new character</button>
+      <NewCharacter />
       {loading ? (
         <span>Loading...</span>
       ) : (
